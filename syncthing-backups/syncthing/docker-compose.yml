@@ -1,0 +1,30 @@
+﻿version: '3.8'
+services:
+  syncthing:
+    image: syncthing/syncthing:1.9.0
+    container_name: syncthing
+    hostname: backups
+    restart: unless-stopped
+    ports:
+      - 22000:22000
+    environment:
+      - "STTRACE=discover"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=http_network"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.routers.syncthing.rule=Host(`syncthing.domain.tld`)"
+      - "traefik.http.routers.syncthing.service=syncthing"
+      - "traefik.http.routers.syncthing.tls=true"
+      - "traefik.http.routers.syncthing.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.syncthing.tls.domains[0].main=syncthing.domain.tld"
+      - "traefik.http.routers.syncthing.tls.options=default"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+      - "traefik.http.services.syncthing.loadbalancer.server.scheme=http"
+    volumes:
+      - /mnt/docker/syncthing:/var/syncthing
+    networks:
+      - http_network
+networks:
+  http_network:
+    external: true

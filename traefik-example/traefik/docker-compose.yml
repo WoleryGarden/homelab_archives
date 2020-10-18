@@ -1,0 +1,50 @@
+version: '3.8'
+
+networks:
+  http_network:
+    external: true
+
+services:
+ 
+  traefik:
+    image: traefik:v2.3.1
+    container_name: "traefik"
+    restart: unless-stopped
+    networks:
+      - http_network
+    ports:
+      # This allows incoming connection on 80 to be forwarder to port 80 of traefik
+      - "80:80"
+      # This allows incoming connection on 443 to be forwarder to port 443 of traefik
+      - "443:443"
+      # As above. Browse to port 8080 http to see trafik dashboard in insecure mode
+      # - "8080:8080"
+    volumes:
+      # static config
+      - "./traefik.toml:/traefik.toml"
+      # dynamic config
+      - "./file.toml:/file.toml"
+      # let's encrypt data
+      - "./acme:/acme"
+      # This is required for the docker provider of traefik to work (read container labels, etc)
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    # Those labels are if you want to see trafik dashboard in secure mode. Comment out the entire block if not needed
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=http_network"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      # Change to your domain name
+      - "traefik.http.routers.traefik.rule=Host(`traefik.domain.tld`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      # Comment out if auth is not needed
+      - "traefik.http.routers.traefik.middlewares=auth"
+      # Comment out if auth is not needed
+      # Basic Auth docs: ttps://doc.traefik.io/traefik/middlewares/basicauth/#configuration-options
+      # Use htpasswd to generate the passwords. Replace generated user/password here
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH}"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      # Change to your domain name
+      - "traefik.http.routers.traefik.tls.domains[0].main=traefik.domain.tld"
+      - "traefik.http.routers.traefik.tls.options=default"
+

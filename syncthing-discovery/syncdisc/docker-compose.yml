@@ -1,0 +1,28 @@
+﻿version: '3.8'
+services:
+  syncthing:
+    image: syncthing/discosrv:1.9.0
+    container_name: discosrv
+    restart: unless-stopped
+    command: ["-http", "-debug"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=http_network"
+      - "traefik.http.routers.syncdisc.entrypoints=websecure"
+      - "traefik.http.routers.syncdisc.rule=Host(`syncdisc.domain.tld`)"
+      - "traefik.http.routers.syncdisc.service=syncdisc"
+      - "traefik.http.routers.syncdisc.tls=true"
+      - "traefik.http.routers.syncdisc.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.syncdisc.tls.domains[0].main=syncdisc.domain.tld"
+      - "traefik.http.routers.syncdisc.tls.options=syncthing_discovr@file"
+      - "traefik.http.routers.syncdisc.middlewares=syncthing_discovr_passtls"
+      - "traefik.http.middlewares.syncthing_discovr_passtls.passtlsclientcert.pem=true"
+      - "traefik.http.services.syncdisc.loadbalancer.server.port=8443"
+      - "traefik.http.services.syncdisc.loadbalancer.server.scheme=http"
+    volumes:
+      - /mnt/docker/stdiscosrv:/var/stdiscosrv
+    networks:
+      - http_network
+networks:
+  http_network:
+    external: true

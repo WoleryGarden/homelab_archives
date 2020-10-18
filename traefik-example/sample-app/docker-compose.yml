@@ -1,0 +1,32 @@
+version: '3.8'
+
+networks:
+  http_network:
+    external: true
+
+services:
+
+  # Change to your service name
+  astroservercheck:
+    # Change to your image
+    image: traefik/whoami:v1.6.0
+    # Change to your container name
+    container_name: whoami
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=http_network"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      # Change to your app host. Make sure that external DNS resolves to the IP traefik can be reached on
+      - "traefik.http.routers.whoami.rule=Host(`whoami.domain.tld`)"
+      - "traefik.http.routers.whoami.service=whoami"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+      # Change to your app host. Make sure that external DNS resolves to the IP traefik can be reached on
+      - "traefik.http.routers.whoami.tls.domains[0].main=whoami.domain.tld"
+      - "traefik.http.routers.whoami.tls.options=default"
+      # Change to your app port
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+      - "traefik.http.services.whoami.loadbalancer.server.scheme=http"
+    networks:
+      - http_network

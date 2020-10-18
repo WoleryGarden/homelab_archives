@@ -1,0 +1,32 @@
+version: '3.8'
+
+networks:
+  http_network:
+    external: true
+
+services:
+
+  traefik:
+    image: traefik:v2.3.1
+    container_name: "traefik"
+    restart: unless-stopped
+    networks:
+      - http_network
+    environment:
+      - CF_DNS_API_TOKEN=$CF_DNS_API_TOKEN
+    ports:
+      # This allows incoming connection on 80 to be forwarder to port 80 of traefik
+      - "80:80"
+      # This allows incoming connection on 443 to be forwarder to port 443 of traefik
+      - "443:443"
+      # As above. Browse to port 8080 http to see trafik dashboard in insecure mode
+      # - "8080:8080"
+    volumes:
+      # static config
+      - "./traefik.toml:/traefik.toml"
+      # dynamic config
+      - "./file.toml:/file.toml"
+      # let's encrypt data
+      - "./acme:/acme"
+      # This is required for the docker provider of traefik to work (read container labels, etc)
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

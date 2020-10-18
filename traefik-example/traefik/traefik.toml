@@ -1,0 +1,41 @@
+## static configuration
+
+[entryPoints.websecure]
+address = ":443"
+
+[entryPoints.web]
+address = ":80"
+[entryPoints.web.http.redirections.entryPoint]
+to = "websecure"
+
+[providers.docker]
+exposedByDefault=false
+
+[providers.file]
+filename = "/file.toml"
+
+
+[log]
+# Uncomment for debug log
+#level = "DEBUG"
+
+# Uncomment for access log
+#[accessLog]
+
+# Comment out if dashboard is not needed
+[api]
+# Uncomment for insecure dashboard
+#insecure = true
+
+[certificatesResolvers.letsencrypt.acme]
+# Your email for Let's Encrypt
+email = "admin@domain.com"
+# Uncomment staging Let's Encrypt while testing to avoid hitting the rate limit
+#caserver= "https://acme-staging-v02.api.letsencrypt.org/directory"
+storage = "/acme/acme.json"
+[certificatesResolvers.letsencrypt.acme.tlsChallenge]
+
+# If you want to switch to DNS challange (e.g. private servers) uncomment below
+# and configure DNS provider. Also comment out tlsChallenge above
+#[certificatesResolvers.letsencrypt.acme.dnsChallenge]
+#provider = "cloudflare"
