@@ -1,0 +1,1 @@
+15 * * * * /home/fctrserver/backup.sh >> /home/fctrserver/backup.log 2>&1
