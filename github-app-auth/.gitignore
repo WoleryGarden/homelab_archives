@@ -1,0 +1,5 @@
+# Local virtualenv created next to the scripts
+.venv/
+
+# The GitHub App private key — never commit it
+*.pem

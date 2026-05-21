@@ -1,3 +1,14 @@
+# Config sourced by github-gen.sh / github-app-token.py.
+# Edit all three values for your own GitHub App and account.
+
+# Your GitHub App's ID (App settings page).
 export GITHUB_APP_ID="3214500"
+
+# The account or org that owns the repos you authenticate against.
+# Used only as a default; github-gen.sh overrides it per request based on the
+# repo path Git asks for.
 export GITHUB_APP_OWNER="AndrewSav"
+
+# Path to the App's private key. A leading ~ is expanded by the Python script.
+# Keep this file OUTSIDE the repo (it is the real secret) and chmod 600 it.
 export GITHUB_APP_PEM="~/github.pem"

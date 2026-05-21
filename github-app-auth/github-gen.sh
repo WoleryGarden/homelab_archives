@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source ~/github_export
+# Resolve this script's own directory so the tooling works no matter where the
+# repo is cloned. All sibling files are referenced relative to SCRIPT_DIR.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+source "$SCRIPT_DIR/github_export"
 
 protocol=""
 host=""
@@ -24,7 +28,7 @@ if [[ -z "${owner:-}" || -z "${repo:-}" || "$owner" == "$repo_path" ]]; then
   exit 1
 fi
 
-token="$(GITHUB_APP_OWNER="$owner" ~/venvs/github-app/bin/python ~/github-app-token.py "$repo")"
+token="$(GITHUB_APP_OWNER="$owner" "$SCRIPT_DIR/.venv/bin/python" "$SCRIPT_DIR/github-app-token.py" "$repo")"
 
 echo "username=x-access-token"
 echo "password=$token"
